@@ -119,6 +119,43 @@
     font-style:italic;
   }
 
+  .form-group input[type="file"]{
+    border:2px dashed var(--blush);
+    background:#fff;
+    padding:14px 16px;
+    font-size:13px;
+  }
+
+  .field-hint{
+    margin-top:6px;
+    font-size:12px;
+    color:var(--text-dark);
+    opacity:0.6;
+  }
+
+  .image-preview-wrap{
+    display:none;
+    align-items:center;
+    gap:12px;
+    margin-top:10px;
+  }
+
+  .image-preview-wrap img{
+    width:64px;
+    height:64px;
+    object-fit:cover;
+    border-radius:12px;
+    border:2px solid var(--blush);
+  }
+
+  .image-preview-wrap button{
+    background:#fff;
+    color:var(--deep-rose);
+    border:2px solid var(--rose);
+    padding:8px 16px;
+    font-size:13px;
+  }
+
   #createBtn{
     width:100%;
     background:linear-gradient(135deg, var(--rose), var(--deep-rose));
@@ -294,7 +331,7 @@
   }
 
   #noBtn.fixed-pos{
-    position:fixed;
+    position:absolute;
     z-index:50;
   }
 
@@ -422,6 +459,16 @@ So here's my heart, no longer hiding —
 yours to hold, yours for the keeping. 💓</textarea>
     </div>
 
+    <div class="form-group">
+      <label for="catImageInput">Cat image (optional)</label>
+      <input type="file" id="catImageInput" accept="image/*" onchange="handleImageUpload(event)">
+      <div id="imagePreviewWrap" class="image-preview-wrap">
+        <img id="imagePreview" alt="">
+        <button type="button" id="removeImageBtn" onclick="clearImage()">Remove</button>
+      </div>
+      <p class="field-hint">Leave blank to keep the default crying-cat drawing.</p>
+    </div>
+
     <button id="createBtn" onclick="createPage()">Create my link 💕</button>
 
     <div id="linkResult" class="link-result">
@@ -457,7 +504,7 @@ yours to hold, yours for the keeping. 💓</textarea>
     <div class="final-sub">You said yes</div>
     <div class="final-title" id="finalMessageText">That's my love 💓</div>
 
-    <svg class="cat-illustration" viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg">
+    <svg class="cat-illustration" id="catSvg" viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg">
       <!-- tail -->
       <path d="M195 150 C 225 140, 230 110, 210 95" stroke="#E8B6A4" stroke-width="14" fill="none" stroke-linecap="round"/>
       <!-- body -->
@@ -503,6 +550,8 @@ yours to hold, yours for the keeping. 💓</textarea>
       </g>
     </svg>
 
+    <img class="cat-illustration" id="catImage" alt="" style="display:none; object-fit:cover; border-radius:20px;">
+
     <div class="poem" id="poemText">I asked, half-hoping, half-afraid,
 of all the words my heart had made —
 and you said yes, so soft, so true,
@@ -541,6 +590,13 @@ yours to hold, yours for the keeping. 💓</div>
       document.getElementById('poemText').textContent = data.p;
     }
     document.getElementById('poemSignature').textContent = 'forever starts now — ' + (data.b || 'Me') + ' 💌';
+
+    if(data.i){
+      document.getElementById('catSvg').style.display = 'none';
+      const img = document.getElementById('catImage');
+      img.src = data.i;
+      img.style.display = 'block';
+    }
   }
 
   // ---------- setup / customization ----------
@@ -550,7 +606,8 @@ yours to hold, yours for the keeping. 💓</div>
       b: document.getElementById('boyName').value.trim() || 'Me',
       q: document.getElementById('mainQuestionInput').value.trim() || 'Will you be mine, forever? 💗',
       f: document.getElementById('finalMessageInput').value.trim() || "That's my love 💓",
-      p: document.getElementById('poemInput').value.trim()
+      p: document.getElementById('poemInput').value.trim(),
+      i: uploadedImageData
     };
 
     const encoded = encodeData(data);
@@ -559,6 +616,43 @@ yours to hold, yours for the keeping. 💓</div>
     document.getElementById('linkOutput').value = url;
     document.getElementById('previewLink').href = url;
     document.getElementById('linkResult').style.display = 'block';
+  }
+
+  // ---------- cat image upload (from gallery, resized + compressed) ----------
+  let uploadedImageData = '';
+
+  function handleImageUpload(event){
+    const file = event.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e){
+      const img = new Image();
+      img.onload = function(){
+        const maxDim = 480;
+        let w = img.width, h = img.height;
+        if(w > h && w > maxDim){ h = Math.round(h * (maxDim / w)); w = maxDim; }
+        else if(h > maxDim){ w = Math.round(w * (maxDim / h)); h = maxDim; }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+        uploadedImageData = canvas.toDataURL('image/jpeg', 0.7);
+
+        document.getElementById('imagePreview').src = uploadedImageData;
+        document.getElementById('imagePreviewWrap').style.display = 'flex';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearImage(){
+    uploadedImageData = '';
+    document.getElementById('catImageInput').value = '';
+    document.getElementById('imagePreviewWrap').style.display = 'none';
   }
 
   function copyLink(){
@@ -620,7 +714,23 @@ yours to hold, yours for the keeping. 💓</div>
     "Try the other one instead",
     "Your heart already picked Yes 💓",
     "Okay, I'll stop running... say yes? 🥹",
-    "Yes is literally right there 👉"
+    "Yes is literally right there 👉",
+    "Wow, you really mean it? 😢",
+    "Pretty please? 🥺",
+    "I'll keep asking forever...",
+    "Forever is a long time to keep clicking 😉",
+    "Plot twist: I'm not giving up",
+    "The Yes button is so much nicer, just saying",
+    "Statistically, Yes is the better choice 📊",
+    "I made this whole page just for you...",
+    "Don't break my heart 💔",
+    "Fine, I'll wait. (Still waiting...)",
+    "Are we really doing this right now?",
+    "One more click and I might cry 😭",
+    "Is this really your final answer?",
+    "Okay you win... jk, click Yes 😅",
+    "Deep down you know it's Yes",
+    "This button has given up trying to escape"
   ];
 
   let clickCount = 0;
@@ -636,16 +746,21 @@ yours to hold, yours for the keeping. 💓</div>
     const scale = Math.min(1 + clickCount * 0.07, 1.7);
     yesBtn.style.transform = `scale(${scale})`;
 
-    // move the No button to a random spot on screen
+    // move the No button to a random spot, but only within the question card
     noBtn.classList.add('fixed-pos');
 
+    const card = document.querySelector('#screen-question .card');
+    const cardWidth = card.clientWidth;
+    const cardHeight = card.clientHeight;
     const btnWidth = noBtn.offsetWidth;
     const btnHeight = noBtn.offsetHeight;
-    const maxX = window.innerWidth - btnWidth - 16;
-    const maxY = window.innerHeight - btnHeight - 16;
+    const margin = 12;
 
-    const randX = Math.max(16, Math.random() * maxX);
-    const randY = Math.max(16, Math.random() * maxY);
+    const maxX = Math.max(margin, cardWidth - btnWidth - margin);
+    const maxY = Math.max(margin, cardHeight - btnHeight - margin);
+
+    const randX = margin + Math.random() * (maxX - margin);
+    const randY = margin + Math.random() * (maxY - margin);
 
     noBtn.style.left = randX + 'px';
     noBtn.style.top = randY + 'px';
