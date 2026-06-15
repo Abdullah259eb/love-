@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Will You Be Mine Forever?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #FFF8F0;
+    --blush: #FFE0E9;
+    --rose: #E0577C;
+    --deep-rose: #C23B5E;
+    --plum: #3D2240;
+    --plum-deep: #2A1730;
+    --gold: #EFC78E;
+    --text-dark: #4A2E3A;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  body{
+    font-family:'Quicksand', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+    color:var(--text-dark);
+  }
+
+  /* ---------- SCREEN BASE ---------- */
+  .screen{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    overflow:hidden;
+  }
+
+  #screen-final{
+    display:none;
+  }
+
+  #screen-question{
+    display:none;
+  }
+
+  /* ---------- SCREEN 0: SETUP ---------- */
+  #screen-setup{
+    background: linear-gradient(160deg, var(--cream) 0%, var(--blush) 100%);
+  }
+
+  .setup-card{
+    position:relative;
+    z-index:1;
+    text-align:left;
+    max-width:480px;
+    width:100%;
+    background:rgba(255,255,255,0.7);
+    backdrop-filter:blur(6px);
+    border-radius:28px;
+    padding:40px 32px;
+    box-shadow:0 20px 60px -20px rgba(194,59,94,0.35);
+    border:1px solid rgba(255,255,255,0.6);
+  }
+
+  .setup-card h2{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size:clamp(24px, 6vw, 32px);
+    color:var(--deep-rose);
+    margin-bottom:6px;
+    text-align:center;
+  }
+
+  .setup-card .subtext{
+    text-align:center;
+    margin-bottom:28px;
+  }
+
+  .form-group{
+    margin-bottom:18px;
+  }
+
+  .form-group label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--rose);
+    margin-bottom:6px;
+  }
+
+  .form-group input,
+  .form-group textarea{
+    width:100%;
+    font-family:'Quicksand', sans-serif;
+    font-size:15px;
+    color:var(--text-dark);
+    background:#fff;
+    border:2px solid var(--blush);
+    border-radius:14px;
+    padding:12px 16px;
+    outline:none;
+    transition:border-color 0.2s ease;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus{
+    border-color:var(--rose);
+  }
+
+  .form-group textarea{
+    resize:vertical;
+    min-height:130px;
+    line-height:1.7;
+    font-style:italic;
+  }
+
+  #createBtn{
+    width:100%;
+    background:linear-gradient(135deg, var(--rose), var(--deep-rose));
+    color:#fff;
+    box-shadow:0 10px 25px -8px rgba(194,59,94,0.6);
+    margin-top:6px;
+  }
+
+  #createBtn:hover{
+    transform:scale(1.02);
+  }
+
+  .link-result{
+    display:none;
+    margin-top:24px;
+    padding-top:20px;
+    border-top:1px dashed var(--blush);
+  }
+
+  .link-result label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--rose);
+    margin-bottom:8px;
+  }
+
+  .link-row{
+    display:flex;
+    gap:8px;
+  }
+
+  #linkOutput{
+    flex:1;
+    font-family:'Quicksand', sans-serif;
+    font-size:13px;
+    color:var(--text-dark);
+    background:#fff;
+    border:2px solid var(--blush);
+    border-radius:14px;
+    padding:10px 14px;
+    outline:none;
+  }
+
+  #copyBtn{
+    background:var(--deep-rose);
+    color:#fff;
+    padding:10px 20px;
+    font-size:14px;
+    flex-shrink:0;
+  }
+
+  .preview-link{
+    display:inline-block;
+    margin-top:12px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--deep-rose);
+    text-decoration:none;
+  }
+
+  .preview-link:hover{
+    text-decoration:underline;
+  }
+
+  /* ---------- SCREEN 1: QUESTION ---------- */
+  #screen-question{
+    background: linear-gradient(160deg, var(--cream) 0%, var(--blush) 100%);
+  }
+
+  .hearts-bg{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .heart-float{
+    position:absolute;
+    bottom:-40px;
+    font-size:22px;
+    opacity:0.35;
+    color:var(--rose);
+    animation:floatUp linear infinite;
+  }
+
+  @keyframes floatUp{
+    0%{ transform:translateY(0) rotate(0deg); opacity:0; }
+    10%{ opacity:0.4; }
+    90%{ opacity:0.3; }
+    100%{ transform:translateY(-110vh) rotate(360deg); opacity:0; }
+  }
+
+  .card{
+    position:relative;
+    z-index:1;
+    text-align:center;
+    max-width:440px;
+    width:100%;
+    background:rgba(255,255,255,0.55);
+    backdrop-filter:blur(6px);
+    border-radius:28px;
+    padding:48px 32px 64px;
+    box-shadow:0 20px 60px -20px rgba(194,59,94,0.35);
+    border:1px solid rgba(255,255,255,0.6);
+  }
+
+  .eyebrow{
+    font-size:13px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--rose);
+    font-weight:600;
+    margin-bottom:14px;
+  }
+
+  h1{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size:clamp(28px, 7vw, 42px);
+    line-height:1.25;
+    color:var(--deep-rose);
+    margin-bottom:8px;
+  }
+
+  .subtext{
+    font-size:15px;
+    color:var(--text-dark);
+    opacity:0.7;
+    margin-bottom:40px;
+  }
+
+  .button-zone{
+    position:relative;
+    height:140px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+  }
+
+  button{
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:17px;
+    border:none;
+    border-radius:50px;
+    cursor:pointer;
+    padding:16px 38px;
+    transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.3s ease;
+  }
+
+  #yesBtn{
+    background:linear-gradient(135deg, var(--rose), var(--deep-rose));
+    color:#fff;
+    box-shadow:0 10px 25px -8px rgba(194,59,94,0.6);
+    z-index:3;
+  }
+
+  #yesBtn:hover{
+    transform:scale(1.05);
+  }
+
+  #noBtn{
+    background:#fff;
+    color:var(--deep-rose);
+    border:2px solid var(--rose);
+    z-index:2;
+    position:relative;
+    white-space:nowrap;
+  }
+
+  #noBtn.fixed-pos{
+    position:fixed;
+    z-index:50;
+  }
+
+  /* ---------- SCREEN 2 ---------- */
+  #screen-final{
+    background: radial-gradient(circle at 50% 0%, #5A2E4D 0%, var(--plum) 45%, var(--plum-deep) 100%);
+    color:var(--cream);
+  }
+
+  .final-card{
+    position:relative;
+    z-index:1;
+    text-align:center;
+    max-width:480px;
+    width:100%;
+    animation:revealIn 0.9s ease forwards;
+  }
+
+  @keyframes revealIn{
+    from{ opacity:0; transform:translateY(24px) scale(0.97); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+
+  .final-title{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-style:italic;
+    font-size:clamp(34px, 9vw, 54px);
+    color:var(--gold);
+    margin-bottom:6px;
+    text-shadow:0 4px 30px rgba(239,199,142,0.35);
+  }
+
+  .final-sub{
+    font-size:13px;
+    letter-spacing:0.25em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.5);
+    margin-bottom:28px;
+  }
+
+  .cat-illustration{
+    width:200px;
+    margin:0 auto 28px;
+    filter:drop-shadow(0 12px 24px rgba(0,0,0,0.35));
+  }
+
+  .poem{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:clamp(16px, 4vw, 19px);
+    line-height:1.9;
+    color:rgba(255,247,242,0.92);
+    white-space:pre-line;
+  }
+
+  .poem-signature{
+    margin-top:24px;
+    font-family:'Quicksand', sans-serif;
+    font-weight:600;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--gold);
+    opacity:0.8;
+  }
+
+  /* small confetti hearts on final screen */
+  .confetti-heart{
+    position:absolute;
+    font-size:18px;
+    color:var(--gold);
+    opacity:0;
+    animation:confettiFall linear forwards;
+  }
+
+  @keyframes confettiFall{
+    0%{ transform:translateY(-10vh) rotate(0deg); opacity:0.9; }
+    100%{ transform:translateY(110vh) rotate(540deg); opacity:0; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .heart-float, .confetti-heart{ animation:none; display:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SCREEN 0: SETUP / CUSTOMIZATION -->
+<section class="screen" id="screen-setup">
+  <div class="setup-card">
+    <h2>Customize your page 💌</h2>
+    <p class="subtext">Fill these in, then create your link.</p>
+
+    <div class="form-group">
+      <label for="girlName">Her name</label>
+      <input type="text" id="girlName" placeholder="e.g. Dr. Warda" value="Dr. Warda">
+    </div>
+
+    <div class="form-group">
+      <label for="boyName">Your name</label>
+      <input type="text" id="boyName" placeholder="e.g. Jee.kon" value="Jee.kon">
+    </div>
+
+    <div class="form-group">
+      <label for="mainQuestionInput">Main question</label>
+      <input type="text" id="mainQuestionInput" placeholder="e.g. Will you be mine, forever?" value="Will you be mine, forever? 💗">
+    </div>
+
+    <div class="form-group">
+      <label for="finalMessageInput">Final page message</label>
+      <input type="text" id="finalMessageInput" placeholder="e.g. That's my love" value="That's my love 💓">
+    </div>
+
+    <div class="form-group">
+      <label for="poemInput">Final page poem</label>
+      <textarea id="poemInput">I asked, half-hoping, half-afraid,
+of all the words my heart had made —
+and you said yes, so soft, so true,
+now "forever" sounds like you.
+
+Every storm I'll face feels small,
+knowing you'll be there through it all.
+So here's my heart, no longer hiding —
+yours to hold, yours for the keeping. 💓</textarea>
+    </div>
+
+    <button id="createBtn" onclick="createPage()">Create my link 💕</button>
+
+    <div id="linkResult" class="link-result">
+      <label>Your custom link — share this one</label>
+      <div class="link-row">
+        <input type="text" id="linkOutput" readonly onclick="this.select()">
+        <button id="copyBtn" onclick="copyLink()">Copy</button>
+      </div>
+      <a id="previewLink" href="#" target="_blank" class="preview-link">Open it to preview →</a>
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN 1: THE QUESTION -->
+<section class="screen" id="screen-question">
+  <div class="hearts-bg" id="heartsBg"></div>
+
+  <div class="card">
+    <div class="eyebrow" id="eyebrowText">For Dr. Warda</div>
+    <h1 id="mainQuestionText">Will you be mine,<br>forever? 💗</h1>
+    <p class="subtext">Take your time. Well, actually — there's only one real option.</p>
+
+    <div class="button-zone">
+      <button id="yesBtn" onclick="sayYes()">Yes 💓</button>
+      <button id="noBtn" onclick="dodgeNo()">No</button>
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN 2: THE REVEAL -->
+<section class="screen" id="screen-final">
+  <div class="final-card">
+    <div class="final-sub">You said yes</div>
+    <div class="final-title" id="finalMessageText">That's my love 💓</div>
+
+    <svg class="cat-illustration" viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- tail -->
+      <path d="M195 150 C 225 140, 230 110, 210 95" stroke="#E8B6A4" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <!-- body -->
+      <ellipse cx="120" cy="155" rx="78" ry="48" fill="#F3CDBC"/>
+      <!-- head -->
+      <circle cx="105" cy="95" r="62" fill="#F6D6C7"/>
+      <!-- ears -->
+      <path d="M58 60 L48 18 L92 48 Z" fill="#F6D6C7"/>
+      <path d="M152 60 L172 16 L120 48 Z" fill="#F6D6C7"/>
+      <path d="M64 54 L58 30 L84 48 Z" fill="#F2A6B6"/>
+      <path d="M146 54 L160 28 L126 48 Z" fill="#F2A6B6"/>
+      <!-- closed happy-sad eyes -->
+      <path d="M76 92 Q86 80 96 92" stroke="#7A5566" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M118 92 Q128 80 138 92" stroke="#7A5566" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <!-- tears -->
+      <path d="M82 100 C 78 110, 78 120, 84 124 C 90 120, 90 110, 86 100 Z" fill="#9FD8F2"/>
+      <path d="M128 100 C 124 110, 124 122, 130 127 C 136 122, 136 110, 132 100 Z" fill="#9FD8F2"/>
+      <!-- nose & mouth -->
+      <path d="M101 108 L109 108 L105 114 Z" fill="#E08CA0"/>
+      <path d="M105 114 Q105 122 96 124" stroke="#7A5566" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M105 114 Q105 122 114 124" stroke="#7A5566" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- whiskers -->
+      <path d="M70 104 L40 100 M70 110 L40 112 M140 104 L170 100 M140 110 L170 112" stroke="#E8B6A4" stroke-width="3" stroke-linecap="round"/>
+      <!-- blush -->
+      <circle cx="75" cy="112" r="8" fill="#F6A9B8" opacity="0.6"/>
+      <circle cx="135" cy="112" r="8" fill="#F6A9B8" opacity="0.6"/>
+
+      <!-- paw holding flower -->
+      <path d="M168 150 C 195 145, 205 165, 188 178 C 172 188, 155 178, 158 162 Z" fill="#F6D6C7"/>
+
+      <!-- flower stem -->
+      <path d="M188 168 C 200 145, 205 110, 198 78" stroke="#7FB88A" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M198 120 C 212 116, 220 124, 214 134" stroke="#7FB88A" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+      <!-- flower petals -->
+      <g transform="translate(198,70)">
+        <circle cx="0" cy="-16" r="13" fill="#F2A6C2"/>
+        <circle cx="14" cy="-7" r="13" fill="#F2A6C2"/>
+        <circle cx="9" cy="11" r="13" fill="#F2A6C2"/>
+        <circle cx="-9" cy="11" r="13" fill="#F2A6C2"/>
+        <circle cx="-14" cy="-7" r="13" fill="#F2A6C2"/>
+        <circle cx="0" cy="0" r="11" fill="#F7D87A"/>
+      </g>
+    </svg>
+
+    <div class="poem" id="poemText">I asked, half-hoping, half-afraid,
+of all the words my heart had made —
+and you said yes, so soft, so true,
+now "forever" sounds like you.
+
+Every storm I'll face feels small,
+knowing you'll be there through it all.
+So here's my heart, no longer hiding —
+yours to hold, yours for the keeping. 💓</div>
+
+    <div class="poem-signature" id="poemSignature">forever starts now — Jee.kon 💌</div>
+  </div>
+</section>
+
+<script>
+  // ---------- data encode / decode (for shareable links) ----------
+  function encodeData(obj){
+    const json = JSON.stringify(obj);
+    return btoa(unescape(encodeURIComponent(json)))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  function decodeData(str){
+    let b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    while(b64.length % 4) b64 += '=';
+    const json = decodeURIComponent(escape(atob(b64)));
+    return JSON.parse(json);
+  }
+
+  // ---------- apply data to the question + final screens ----------
+  function applyData(data){
+    document.getElementById('eyebrowText').textContent = 'For ' + (data.g || 'Love');
+    document.getElementById('mainQuestionText').textContent = data.q || 'Will you be mine, forever? 💗';
+    document.getElementById('finalMessageText').textContent = data.f || "That's my love 💓";
+    if(data.p){
+      document.getElementById('poemText').textContent = data.p;
+    }
+    document.getElementById('poemSignature').textContent = 'forever starts now — ' + (data.b || 'Me') + ' 💌';
+  }
+
+  // ---------- setup / customization ----------
+  function createPage(){
+    const data = {
+      g: document.getElementById('girlName').value.trim() || 'Love',
+      b: document.getElementById('boyName').value.trim() || 'Me',
+      q: document.getElementById('mainQuestionInput').value.trim() || 'Will you be mine, forever? 💗',
+      f: document.getElementById('finalMessageInput').value.trim() || "That's my love 💓",
+      p: document.getElementById('poemInput').value.trim()
+    };
+
+    const encoded = encodeData(data);
+    const url = window.location.origin + window.location.pathname + '#go=' + encoded;
+
+    document.getElementById('linkOutput').value = url;
+    document.getElementById('previewLink').href = url;
+    document.getElementById('linkResult').style.display = 'block';
+  }
+
+  function copyLink(){
+    const input = document.getElementById('linkOutput');
+    input.select();
+    navigator.clipboard.writeText(input.value).then(()=>{
+      const btn = document.getElementById('copyBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(()=> btn.textContent = original, 1500);
+    }).catch(()=>{
+      document.execCommand('copy');
+    });
+  }
+
+  // ---------- on load: if this is a custom link, skip straight to the question ----------
+  (function init(){
+    const hash = window.location.hash;
+    if(hash.startsWith('#go=')){
+      try{
+        const data = decodeData(hash.slice(4));
+        applyData(data);
+        document.getElementById('screen-setup').style.display = 'none';
+        document.getElementById('screen-question').style.display = 'flex';
+        return;
+      }catch(e){
+        // fall through to setup screen if the link is malformed
+      }
+    }
+  })();
+
+  // ---------- floating hearts on screen 1 ----------
+  const heartsBg = document.getElementById('heartsBg');
+  const heartSymbols = ['💗','💕','♥','💖'];
+  for(let i=0;i<14;i++){
+    const h = document.createElement('div');
+    h.className = 'heart-float';
+    h.textContent = heartSymbols[Math.floor(Math.random()*heartSymbols.length)];
+    h.style.left = Math.random()*100 + '%';
+    h.style.fontSize = (14 + Math.random()*18) + 'px';
+    h.style.animationDuration = (8 + Math.random()*10) + 's';
+    h.style.animationDelay = (Math.random()*10) + 's';
+    heartsBg.appendChild(h);
+  }
+
+  // ---------- "No" button logic ----------
+  const noBtn = document.getElementById('noBtn');
+  const yesBtn = document.getElementById('yesBtn');
+
+  const noMessages = [
+    "No",
+    "Are you sure?",
+    "Really sure? 🤔",
+    "Hmm, think again...",
+    "Last chance to change your mind!",
+    "Error: button not responding",
+    "404 — 'No' not found",
+    "This button seems broken 😅",
+    "Try the other one instead",
+    "Your heart already picked Yes 💓",
+    "Okay, I'll stop running... say yes? 🥹",
+    "Yes is literally right there 👉"
+  ];
+
+  let clickCount = 0;
+
+  function dodgeNo(){
+    clickCount++;
+
+    // update message (cap index at last message, then cycle the last few)
+    const idx = Math.min(clickCount, noMessages.length - 1);
+    noBtn.textContent = noMessages[idx];
+
+    // grow the Yes button a little each time, up to a cap
+    const scale = Math.min(1 + clickCount * 0.07, 1.7);
+    yesBtn.style.transform = `scale(${scale})`;
+
+    // move the No button to a random spot on screen
+    noBtn.classList.add('fixed-pos');
+
+    const btnWidth = noBtn.offsetWidth;
+    const btnHeight = noBtn.offsetHeight;
+    const maxX = window.innerWidth - btnWidth - 16;
+    const maxY = window.innerHeight - btnHeight - 16;
+
+    const randX = Math.max(16, Math.random() * maxX);
+    const randY = Math.max(16, Math.random() * maxY);
+
+    noBtn.style.left = randX + 'px';
+    noBtn.style.top = randY + 'px';
+  }
+
+  // ---------- "Yes" button logic ----------
+  function sayYes(){
+    document.getElementById('screen-question').style.display = 'none';
+    const finalScreen = document.getElementById('screen-final');
+    finalScreen.style.display = 'flex';
+
+    // gold confetti hearts
+    for(let i=0;i<24;i++){
+      const c = document.createElement('div');
+      c.className = 'confetti-heart';
+      c.textContent = ['💛','💖','✨','💗'][Math.floor(Math.random()*4)];
+      c.style.left = Math.random()*100 + '%';
+      c.style.fontSize = (14 + Math.random()*16) + 'px';
+      c.style.animationDuration = (3 + Math.random()*4) + 's';
+      c.style.animationDelay = (Math.random()*2) + 's';
+      finalScreen.appendChild(c);
+    }
+  }
+</script>
+
+</body>
+</html>
