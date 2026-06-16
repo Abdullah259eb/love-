@@ -290,9 +290,16 @@
     margin-bottom:40px;
   }
 
+  .dodge-zone{
+    position:relative;
+    width:100%;
+    height:170px;
+    overflow:hidden;
+  }
+
   .button-zone{
     position:relative;
-    height:140px;
+    height:100%;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -327,12 +334,16 @@
     border:2px solid var(--rose);
     z-index:2;
     position:relative;
-    white-space:nowrap;
+    white-space:normal;
+    max-width:200px;
+    text-align:center;
+    line-height:1.3;
   }
 
   #noBtn.fixed-pos{
     position:absolute;
     z-index:50;
+    margin:0;
   }
 
   /* ---------- SCREEN 2 ---------- */
@@ -469,6 +480,12 @@ yours to hold, yours for the keeping. 💓</textarea>
       <p class="field-hint">Leave blank to keep the default crying-cat drawing.</p>
     </div>
 
+    <div class="form-group">
+      <label for="apiKeyInput">JSONBin API key</label>
+      <input type="text" id="apiKeyInput" placeholder="Paste your JSONBin Master Key here">
+      <p class="field-hint">Get a free key at <strong>jsonbin.io</strong> → Sign up → API Keys → Master Key. This lets your image be stored online so the link stays short.</p>
+    </div>
+
     <button id="createBtn" onclick="createPage()">Create my link 💕</button>
 
     <div id="linkResult" class="link-result">
@@ -478,6 +495,7 @@ yours to hold, yours for the keeping. 💓</textarea>
         <button id="copyBtn" onclick="copyLink()">Copy</button>
       </div>
       <a id="previewLink" href="#" target="_blank" class="preview-link">Open it to preview →</a>
+      <p id="linkNote" class="field-hint" style="margin-top:8px;"></p>
     </div>
   </div>
 </section>
@@ -491,9 +509,11 @@ yours to hold, yours for the keeping. 💓</textarea>
     <h1 id="mainQuestionText">Will you be mine,<br>forever? 💗</h1>
     <p class="subtext">Take your time. Well, actually — there's only one real option.</p>
 
-    <div class="button-zone">
-      <button id="yesBtn" onclick="sayYes()">Yes 💓</button>
-      <button id="noBtn" onclick="dodgeNo()">No</button>
+    <div class="dodge-zone">
+      <div class="button-zone">
+        <button id="yesBtn" onclick="sayYes()">Yes 💓</button>
+        <button id="noBtn" onclick="dodgeNo()">No</button>
+      </div>
     </div>
   </div>
 </section>
@@ -600,7 +620,8 @@ yours to hold, yours for the keeping. 💓</div>
   }
 
   // ---------- setup / customization ----------
-  function createPage(){
+  async function createPage(){
+    const apiKey = document.getElementById('apiKeyInput').value.trim();
     const data = {
       g: document.getElementById('girlName').value.trim() || 'Love',
       b: document.getElementById('boyName').value.trim() || 'Me',
@@ -610,12 +631,55 @@ yours to hold, yours for the keeping. 💓</div>
       i: uploadedImageData
     };
 
-    const encoded = encodeData(data);
-    const url = window.location.origin + window.location.pathname + '#go=' + encoded;
+    const createBtn = document.getElementById('createBtn');
 
-    document.getElementById('linkOutput').value = url;
-    document.getElementById('previewLink').href = url;
-    document.getElementById('linkResult').style.display = 'block';
+    // No API key — fall back to encoding in URL (no custom image support)
+    if(!apiKey){
+      const dataCopy = {...data, i:''};
+      const encoded = encodeData(dataCopy);
+      const url = window.location.origin + window.location.pathname + '?go=' + encoded;
+      document.getElementById('linkOutput').value = url;
+      document.getElementById('previewLink').href = url;
+      document.getElementById('linkResult').style.display = 'block';
+      document.getElementById('linkNote').textContent = 'No API key — image not included to keep link short.';
+      return;
+    }
+
+    // Save to JSONBin → get a short bin ID
+    createBtn.textContent = 'Saving... ⏳';
+    createBtn.disabled = true;
+
+    try{
+      const resp = await fetch('https://api.jsonbin.io/v3/b', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': apiKey,
+          'X-Bin-Name': 'love-page',
+          'X-Bin-Private': 'false'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if(!resp.ok){
+        const err = await resp.json().catch(()=>({}));
+        throw new Error(err.message || 'JSONBin responded with ' + resp.status);
+      }
+
+      const result = await resp.json();
+      const binId = result.metadata.id;
+      const url = window.location.origin + window.location.pathname + '?id=' + binId;
+
+      document.getElementById('linkOutput').value = url;
+      document.getElementById('previewLink').href = url;
+      document.getElementById('linkResult').style.display = 'block';
+      document.getElementById('linkNote').textContent = '✓ Image stored online. Link is short and clean!';
+    } catch(err){
+      alert('Could not save: ' + err.message + '\n\nCheck your JSONBin Master Key and try again.');
+    } finally{
+      createBtn.textContent = 'Create my link 💕';
+      createBtn.disabled = false;
+    }
   }
 
   // ---------- cat image upload (from gallery, resized + compressed) ----------
@@ -629,7 +693,9 @@ yours to hold, yours for the keeping. 💓</div>
     reader.onload = function(e){
       const img = new Image();
       img.onload = function(){
-        const maxDim = 480;
+        // Very aggressive compression: max 200px, low quality
+        // This keeps the base64 string short enough for a shareable link
+        const maxDim = 200;
         let w = img.width, h = img.height;
         if(w > h && w > maxDim){ h = Math.round(h * (maxDim / w)); w = maxDim; }
         else if(h > maxDim){ w = Math.round(w * (maxDim / h)); h = maxDim; }
@@ -639,7 +705,11 @@ yours to hold, yours for the keeping. 💓</div>
         canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
 
-        uploadedImageData = canvas.toDataURL('image/jpeg', 0.7);
+        uploadedImageData = canvas.toDataURL('image/jpeg', 0.35);
+
+        const sizeKB = Math.round(uploadedImageData.length * 0.75 / 1024);
+        const hint = document.querySelector('.field-hint');
+        hint.textContent = `✓ Image compressed to ~${sizeKB}KB. Link will be longer but shareable.`;
 
         document.getElementById('imagePreview').src = uploadedImageData;
         document.getElementById('imagePreviewWrap').style.display = 'flex';
@@ -669,7 +739,40 @@ yours to hold, yours for the keeping. 💓</div>
   }
 
   // ---------- on load: if this is a custom link, skip straight to the question ----------
-  (function init(){
+  (async function init(){
+    const params = new URLSearchParams(window.location.search);
+
+    // Short link mode — fetch from JSONBin
+    if(params.has('id')){
+      const binId = params.get('id');
+      try{
+        const resp = await fetch('https://api.jsonbin.io/v3/b/' + binId + '/latest');
+        if(!resp.ok) throw new Error('fetch failed');
+        const result = await resp.json();
+        const data = result.record;
+        applyData(data);
+        document.getElementById('screen-setup').style.display = 'none';
+        document.getElementById('screen-question').style.display = 'flex';
+        return;
+      } catch(e){
+        // fall through to setup
+      }
+    }
+
+    // Fallback encoded URL mode
+    if(params.has('go')){
+      try{
+        const data = decodeData(params.get('go'));
+        applyData(data);
+        document.getElementById('screen-setup').style.display = 'none';
+        document.getElementById('screen-question').style.display = 'flex';
+        return;
+      } catch(e){
+        // fall through to setup
+      }
+    }
+
+    // Legacy hash mode
     const hash = window.location.hash;
     if(hash.startsWith('#go=')){
       try{
@@ -678,9 +781,7 @@ yours to hold, yours for the keeping. 💓</div>
         document.getElementById('screen-setup').style.display = 'none';
         document.getElementById('screen-question').style.display = 'flex';
         return;
-      }catch(e){
-        // fall through to setup screen if the link is malformed
-      }
+      }catch(e){}
     }
   })();
 
@@ -746,21 +847,20 @@ yours to hold, yours for the keeping. 💓</div>
     const scale = Math.min(1 + clickCount * 0.07, 1.7);
     yesBtn.style.transform = `scale(${scale})`;
 
-    // move the No button to a random spot, but only within the question card
+    // move the No button to a random spot, but only within the dodge zone
     noBtn.classList.add('fixed-pos');
 
-    const card = document.querySelector('#screen-question .card');
-    const cardWidth = card.clientWidth;
-    const cardHeight = card.clientHeight;
+    const zone = document.querySelector('#screen-question .dodge-zone');
+    const zoneWidth = zone.clientWidth;
+    const zoneHeight = zone.clientHeight;
     const btnWidth = noBtn.offsetWidth;
     const btnHeight = noBtn.offsetHeight;
-    const margin = 12;
 
-    const maxX = Math.max(margin, cardWidth - btnWidth - margin);
-    const maxY = Math.max(margin, cardHeight - btnHeight - margin);
+    const maxX = Math.max(0, zoneWidth - btnWidth);
+    const maxY = Math.max(0, zoneHeight - btnHeight);
 
-    const randX = margin + Math.random() * (maxX - margin);
-    const randY = margin + Math.random() * (maxY - margin);
+    const randX = Math.random() * maxX;
+    const randY = Math.random() * maxY;
 
     noBtn.style.left = randX + 'px';
     noBtn.style.top = randY + 'px';
