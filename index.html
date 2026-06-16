@@ -1,890 +1,480 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Will You Be Mine Forever?</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --cream: #FFF8F0;
-    --blush: #FFE0E9;
-    --rose: #E0577C;
-    --deep-rose: #C23B5E;
-    --plum: #3D2240;
-    --plum-deep: #2A1730;
-    --gold: #EFC78E;
-    --text-dark: #4A2E3A;
-  }
-
-  *{margin:0;padding:0;box-sizing:border-box;}
-
-  body{
-    font-family:'Quicksand', sans-serif;
-    min-height:100vh;
-    overflow-x:hidden;
-    color:var(--text-dark);
-  }
-
-  /* ---------- SCREEN BASE ---------- */
-  .screen{
-    position:relative;
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:24px;
-    overflow:hidden;
-  }
-
-  #screen-final{
-    display:none;
-  }
-
-  #screen-question{
-    display:none;
-  }
-
-  /* ---------- SCREEN 0: SETUP ---------- */
-  #screen-setup{
-    background: linear-gradient(160deg, var(--cream) 0%, var(--blush) 100%);
-  }
-
-  .setup-card{
-    position:relative;
-    z-index:1;
-    text-align:left;
-    max-width:480px;
-    width:100%;
-    background:rgba(255,255,255,0.7);
-    backdrop-filter:blur(6px);
-    border-radius:28px;
-    padding:40px 32px;
-    box-shadow:0 20px 60px -20px rgba(194,59,94,0.35);
-    border:1px solid rgba(255,255,255,0.6);
-  }
-
-  .setup-card h2{
-    font-family:'Playfair Display', serif;
-    font-weight:700;
-    font-size:clamp(24px, 6vw, 32px);
-    color:var(--deep-rose);
-    margin-bottom:6px;
-    text-align:center;
-  }
-
-  .setup-card .subtext{
-    text-align:center;
-    margin-bottom:28px;
-  }
-
-  .form-group{
-    margin-bottom:18px;
-  }
-
-  .form-group label{
-    display:block;
-    font-size:12px;
-    font-weight:700;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    color:var(--rose);
-    margin-bottom:6px;
-  }
-
-  .form-group input,
-  .form-group textarea{
-    width:100%;
-    font-family:'Quicksand', sans-serif;
-    font-size:15px;
-    color:var(--text-dark);
-    background:#fff;
-    border:2px solid var(--blush);
-    border-radius:14px;
-    padding:12px 16px;
-    outline:none;
-    transition:border-color 0.2s ease;
-  }
-
-  .form-group input:focus,
-  .form-group textarea:focus{
-    border-color:var(--rose);
-  }
-
-  .form-group textarea{
-    resize:vertical;
-    min-height:130px;
-    line-height:1.7;
-    font-style:italic;
-  }
-
-  .form-group input[type="file"]{
-    border:2px dashed var(--blush);
-    background:#fff;
-    padding:14px 16px;
-    font-size:13px;
-  }
-
-  .field-hint{
-    margin-top:6px;
-    font-size:12px;
-    color:var(--text-dark);
-    opacity:0.6;
-  }
-
-  .image-preview-wrap{
-    display:none;
-    align-items:center;
-    gap:12px;
-    margin-top:10px;
-  }
-
-  .image-preview-wrap img{
-    width:64px;
-    height:64px;
-    object-fit:cover;
-    border-radius:12px;
-    border:2px solid var(--blush);
-  }
-
-  .image-preview-wrap button{
-    background:#fff;
-    color:var(--deep-rose);
-    border:2px solid var(--rose);
-    padding:8px 16px;
-    font-size:13px;
-  }
-
-  #createBtn{
-    width:100%;
-    background:linear-gradient(135deg, var(--rose), var(--deep-rose));
-    color:#fff;
-    box-shadow:0 10px 25px -8px rgba(194,59,94,0.6);
-    margin-top:6px;
-  }
-
-  #createBtn:hover{
-    transform:scale(1.02);
-  }
-
-  .link-result{
-    display:none;
-    margin-top:24px;
-    padding-top:20px;
-    border-top:1px dashed var(--blush);
-  }
-
-  .link-result label{
-    display:block;
-    font-size:12px;
-    font-weight:700;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    color:var(--rose);
-    margin-bottom:8px;
-  }
-
-  .link-row{
-    display:flex;
-    gap:8px;
-  }
-
-  #linkOutput{
-    flex:1;
-    font-family:'Quicksand', sans-serif;
-    font-size:13px;
-    color:var(--text-dark);
-    background:#fff;
-    border:2px solid var(--blush);
-    border-radius:14px;
-    padding:10px 14px;
-    outline:none;
-  }
-
-  #copyBtn{
-    background:var(--deep-rose);
-    color:#fff;
-    padding:10px 20px;
-    font-size:14px;
-    flex-shrink:0;
-  }
-
-  .preview-link{
-    display:inline-block;
-    margin-top:12px;
-    font-size:13px;
-    font-weight:600;
-    color:var(--deep-rose);
-    text-decoration:none;
-  }
-
-  .preview-link:hover{
-    text-decoration:underline;
-  }
-
-  /* ---------- SCREEN 1: QUESTION ---------- */
-  #screen-question{
-    background: linear-gradient(160deg, var(--cream) 0%, var(--blush) 100%);
-  }
-
-  .hearts-bg{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    z-index:0;
-  }
-
-  .heart-float{
-    position:absolute;
-    bottom:-40px;
-    font-size:22px;
-    opacity:0.35;
-    color:var(--rose);
-    animation:floatUp linear infinite;
-  }
-
-  @keyframes floatUp{
-    0%{ transform:translateY(0) rotate(0deg); opacity:0; }
-    10%{ opacity:0.4; }
-    90%{ opacity:0.3; }
-    100%{ transform:translateY(-110vh) rotate(360deg); opacity:0; }
-  }
-
-  .card{
-    position:relative;
-    z-index:1;
-    text-align:center;
-    max-width:440px;
-    width:100%;
-    background:rgba(255,255,255,0.55);
-    backdrop-filter:blur(6px);
-    border-radius:28px;
-    padding:48px 32px 64px;
-    box-shadow:0 20px 60px -20px rgba(194,59,94,0.35);
-    border:1px solid rgba(255,255,255,0.6);
-  }
-
-  .eyebrow{
-    font-size:13px;
-    letter-spacing:0.2em;
-    text-transform:uppercase;
-    color:var(--rose);
-    font-weight:600;
-    margin-bottom:14px;
-  }
-
-  h1{
-    font-family:'Playfair Display', serif;
-    font-weight:700;
-    font-size:clamp(28px, 7vw, 42px);
-    line-height:1.25;
-    color:var(--deep-rose);
-    margin-bottom:8px;
-  }
-
-  .subtext{
-    font-size:15px;
-    color:var(--text-dark);
-    opacity:0.7;
-    margin-bottom:40px;
-  }
-
-  .dodge-zone{
-    position:relative;
-    width:100%;
-    height:170px;
-    overflow:hidden;
-  }
-
-  .button-zone{
-    position:relative;
-    height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:18px;
-  }
-
-  button{
-    font-family:'Quicksand', sans-serif;
-    font-weight:700;
-    font-size:17px;
-    border:none;
-    border-radius:50px;
-    cursor:pointer;
-    padding:16px 38px;
-    transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.3s ease;
-  }
-
-  #yesBtn{
-    background:linear-gradient(135deg, var(--rose), var(--deep-rose));
-    color:#fff;
-    box-shadow:0 10px 25px -8px rgba(194,59,94,0.6);
-    z-index:3;
-  }
-
-  #yesBtn:hover{
-    transform:scale(1.05);
-  }
-
-  #noBtn{
-    background:#fff;
-    color:var(--deep-rose);
-    border:2px solid var(--rose);
-    z-index:2;
-    position:relative;
-    white-space:normal;
-    max-width:200px;
-    text-align:center;
-    line-height:1.3;
-  }
-
-  #noBtn.fixed-pos{
-    position:absolute;
-    z-index:50;
-    margin:0;
-  }
-
-  /* ---------- SCREEN 2 ---------- */
-  #screen-final{
-    background: radial-gradient(circle at 50% 0%, #5A2E4D 0%, var(--plum) 45%, var(--plum-deep) 100%);
-    color:var(--cream);
-  }
-
-  .final-card{
-    position:relative;
-    z-index:1;
-    text-align:center;
-    max-width:480px;
-    width:100%;
-    animation:revealIn 0.9s ease forwards;
-  }
-
-  @keyframes revealIn{
-    from{ opacity:0; transform:translateY(24px) scale(0.97); }
-    to{ opacity:1; transform:translateY(0) scale(1); }
-  }
-
-  .final-title{
-    font-family:'Playfair Display', serif;
-    font-weight:700;
-    font-style:italic;
-    font-size:clamp(34px, 9vw, 54px);
-    color:var(--gold);
-    margin-bottom:6px;
-    text-shadow:0 4px 30px rgba(239,199,142,0.35);
-  }
-
-  .final-sub{
-    font-size:13px;
-    letter-spacing:0.25em;
-    text-transform:uppercase;
-    color:rgba(255,255,255,0.5);
-    margin-bottom:28px;
-  }
-
-  .cat-illustration{
-    width:200px;
-    margin:0 auto 28px;
-    filter:drop-shadow(0 12px 24px rgba(0,0,0,0.35));
-  }
-
-  .poem{
-    font-family:'Playfair Display', serif;
-    font-style:italic;
-    font-size:clamp(16px, 4vw, 19px);
-    line-height:1.9;
-    color:rgba(255,247,242,0.92);
-    white-space:pre-line;
-  }
-
-  .poem-signature{
-    margin-top:24px;
-    font-family:'Quicksand', sans-serif;
-    font-weight:600;
-    letter-spacing:0.1em;
-    text-transform:uppercase;
-    font-size:12px;
-    color:var(--gold);
-    opacity:0.8;
-  }
-
-  /* small confetti hearts on final screen */
-  .confetti-heart{
-    position:absolute;
-    font-size:18px;
-    color:var(--gold);
-    opacity:0;
-    animation:confettiFall linear forwards;
-  }
-
-  @keyframes confettiFall{
-    0%{ transform:translateY(-10vh) rotate(0deg); opacity:0.9; }
-    100%{ transform:translateY(110vh) rotate(540deg); opacity:0; }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    .heart-float, .confetti-heart{ animation:none; display:none; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Love Message 💕</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      text-align: center;
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 2em;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 600;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: border 0.3s;
+    }
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    .file-upload {
+      border: 3px dashed #667eea;
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: #f8f9ff;
+    }
+    .file-upload:hover {
+      background: #eef0ff;
+      transform: translateY(-2px);
+    }
+    .file-upload input {
+      display: none;
+    }
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    .preview {
+      margin-top: 15px;
+      max-width: 100%;
+      border-radius: 10px;
+      display: none;
+    }
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .loader {
+      display: none;
+      text-align: center;
+      margin: 20px 0;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .result {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background: #f0fff4;
+      border: 2px solid #48bb78;
+      border-radius: 10px;
+    }
+    .result h3 {
+      color: #48bb78;
+      margin-bottom: 10px;
+    }
+    .link-box {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      word-break: break-all;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 14px;
+      border: 1px solid #ddd;
+    }
+    .copy-btn {
+      background: #48bb78;
+      margin-top: 10px;
+    }
+    .hidden { display: none; }
+    
+    /* Page 2 & 3 Styles */
+    .question-page, .success-page {
+      text-align: center;
+    }
+    .question-text {
+      font-size: 1.5em;
+      color: #333;
+      margin: 30px 0;
+      font-weight: 600;
+    }
+    .love-image {
+      max-width: 100%;
+      border-radius: 15px;
+      margin: 20px 0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+    .yes-btn {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      padding: 20px 60px;
+      font-size: 24px;
+    }
+    .no-btn {
+      background: #cbd5e0;
+      padding: 20px 60px;
+      font-size: 24px;
+    }
+    .no-btn:hover {
+      background: #a0aec0;
+    }
+    .message {
+      margin: 20px 0;
+      padding: 15px;
+      background: #fff5f5;
+      border-left: 4px solid #fc8181;
+      border-radius: 5px;
+      display: none;
+      color: #c53030;
+    }
+    .heart {
+      font-size: 80px;
+      animation: heartbeat 1.5s ease-in-out infinite;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    .success-text {
+      font-size: 1.3em;
+      color: #333;
+      margin: 20px 0;
+      line-height: 1.6;
+    }
+    .sender-name {
+      color: #667eea;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+  </style>
 </head>
 <body>
 
-<!-- SCREEN 0: SETUP / CUSTOMIZATION -->
-<section class="screen" id="screen-setup">
-  <div class="setup-card">
-    <h2>Customize your page 💌</h2>
-    <p class="subtext">Fill these in, then create your link.</p>
-
-    <div class="form-group">
-      <label for="girlName">Her name</label>
-      <input type="text" id="girlName" placeholder="e.g. Dr. Warda" value="Dr. Warda">
-    </div>
-
-    <div class="form-group">
-      <label for="boyName">Your name</label>
-      <input type="text" id="boyName" placeholder="e.g. Jee.kon" value="Jee.kon">
-    </div>
-
-    <div class="form-group">
-      <label for="mainQuestionInput">Main question</label>
-      <input type="text" id="mainQuestionInput" placeholder="e.g. Will you be mine, forever?" value="Will you be mine, forever? 💗">
-    </div>
-
-    <div class="form-group">
-      <label for="finalMessageInput">Final page message</label>
-      <input type="text" id="finalMessageInput" placeholder="e.g. That's my love" value="That's my love 💓">
-    </div>
-
-    <div class="form-group">
-      <label for="poemInput">Final page poem</label>
-      <textarea id="poemInput">I asked, half-hoping, half-afraid,
-of all the words my heart had made —
-and you said yes, so soft, so true,
-now "forever" sounds like you.
-
-Every storm I'll face feels small,
-knowing you'll be there through it all.
-So here's my heart, no longer hiding —
-yours to hold, yours for the keeping. 💓</textarea>
-    </div>
-
-    <div class="form-group">
-      <label for="catImageInput">Cat image (optional)</label>
-      <input type="file" id="catImageInput" accept="image/*" onchange="handleImageUpload(event)">
-      <div id="imagePreviewWrap" class="image-preview-wrap">
-        <img id="imagePreview" alt="">
-        <button type="button" id="removeImageBtn" onclick="clearImage()">Remove</button>
+  <!-- PAGE 1: Creator -->
+  <div id="page1" class="container">
+    <h1>💕 Love Message Creator</h1>
+    <p class="subtitle">Create a special message for your loved one</p>
+    
+    <form id="loveForm">
+      <div class="form-group">
+        <label>💝 Lover's Name:</label>
+        <input type="text" id="loverName" required placeholder="Enter their name">
       </div>
-      <p class="field-hint">Leave blank to keep the default crying-cat drawing.</p>
-    </div>
-
-    <div class="form-group">
-      <label for="apiKeyInput">JSONBin API key</label>
-      <input type="text" id="apiKeyInput" placeholder="Paste your JSONBin Master Key here">
-      <p class="field-hint">Get a free key at <strong>jsonbin.io</strong> → Sign up → API Keys → Master Key. This lets your image be stored online so the link stays short.</p>
-    </div>
-
-    <button id="createBtn" onclick="createPage()">Create my link 💕</button>
-
-    <div id="linkResult" class="link-result">
-      <label>Your custom link — share this one</label>
-      <div class="link-row">
-        <input type="text" id="linkOutput" readonly onclick="this.select()">
-        <button id="copyBtn" onclick="copyLink()">Copy</button>
+      
+      <div class="form-group">
+        <label>✍️ Your Name:</label>
+        <input type="text" id="senderName" required placeholder="Enter your name">
       </div>
-      <a id="previewLink" href="#" target="_blank" class="preview-link">Open it to preview →</a>
-      <p id="linkNote" class="field-hint" style="margin-top:8px;"></p>
+      
+      <div class="form-group">
+        <label>💬 Your Question:</label>
+        <input type="text" id="question" required placeholder="e.g., Will you be my Valentine?">
+      </div>
+      
+      <div class="form-group">
+        <label>📷 Upload Photo:</label>
+        <label class="file-upload" for="imageInput">
+          <input type="file" id="imageInput" accept="image/*" required>
+          <div class="upload-icon">📁</div>
+          <div>Click to choose a photo</div>
+          <img id="imagePreview" class="preview" alt="Preview">
+        </label>
+      </div>
+      
+      <button type="submit" class="btn" id="createBtn">✨ Create Magic Link</button>
+      
+      <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <p>Creating your link...</p>
+      </div>
+    </form>
+    
+    <div class="result" id="result">
+      <h3>✅ Your Link is Ready!</h3>
+      <p>Share this link with your special someone:</p>
+      <div class="link-box" id="linkBox"></div>
+      <button class="btn copy-btn" onclick="copyLink()">📋 Copy Link</button>
+      <button class="btn" style="margin-top: 10px; background: #667eea;" onclick="location.reload()">➕ Create Another</button>
     </div>
   </div>
-</section>
 
-<!-- SCREEN 1: THE QUESTION -->
-<section class="screen" id="screen-question">
-  <div class="hearts-bg" id="heartsBg"></div>
-
-  <div class="card">
-    <div class="eyebrow" id="eyebrowText">For Dr. Warda</div>
-    <h1 id="mainQuestionText">Will you be mine,<br>forever? 💗</h1>
-    <p class="subtext">Take your time. Well, actually — there's only one real option.</p>
-
-    <div class="dodge-zone">
-      <div class="button-zone">
-        <button id="yesBtn" onclick="sayYes()">Yes 💓</button>
-        <button id="noBtn" onclick="dodgeNo()">No</button>
-      </div>
+  <!-- PAGE 2: Question -->
+  <div id="page2" class="container question-page hidden">
+    <h1>💌 A Special Question</h1>
+    <div class="question-text" id="displayQuestion"></div>
+    <img id="displayImage" class="love-image" style="display: none;">
+    <div class="message" id="noMessage"></div>
+    <div class="buttons">
+      <button class="btn yes-btn" onclick="sayYes()">Yes! ❤️</button>
+      <button class="btn no-btn" id="noBtn" onclick="sayNo()">No 💔</button>
     </div>
   </div>
-</section>
 
-<!-- SCREEN 2: THE REVEAL -->
-<section class="screen" id="screen-final">
-  <div class="final-card">
-    <div class="final-sub">You said yes</div>
-    <div class="final-title" id="finalMessageText">That's my love 💓</div>
-
-    <svg class="cat-illustration" id="catSvg" viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg">
-      <!-- tail -->
-      <path d="M195 150 C 225 140, 230 110, 210 95" stroke="#E8B6A4" stroke-width="14" fill="none" stroke-linecap="round"/>
-      <!-- body -->
-      <ellipse cx="120" cy="155" rx="78" ry="48" fill="#F3CDBC"/>
-      <!-- head -->
-      <circle cx="105" cy="95" r="62" fill="#F6D6C7"/>
-      <!-- ears -->
-      <path d="M58 60 L48 18 L92 48 Z" fill="#F6D6C7"/>
-      <path d="M152 60 L172 16 L120 48 Z" fill="#F6D6C7"/>
-      <path d="M64 54 L58 30 L84 48 Z" fill="#F2A6B6"/>
-      <path d="M146 54 L160 28 L126 48 Z" fill="#F2A6B6"/>
-      <!-- closed happy-sad eyes -->
-      <path d="M76 92 Q86 80 96 92" stroke="#7A5566" stroke-width="4" fill="none" stroke-linecap="round"/>
-      <path d="M118 92 Q128 80 138 92" stroke="#7A5566" stroke-width="4" fill="none" stroke-linecap="round"/>
-      <!-- tears -->
-      <path d="M82 100 C 78 110, 78 120, 84 124 C 90 120, 90 110, 86 100 Z" fill="#9FD8F2"/>
-      <path d="M128 100 C 124 110, 124 122, 130 127 C 136 122, 136 110, 132 100 Z" fill="#9FD8F2"/>
-      <!-- nose & mouth -->
-      <path d="M101 108 L109 108 L105 114 Z" fill="#E08CA0"/>
-      <path d="M105 114 Q105 122 96 124" stroke="#7A5566" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <path d="M105 114 Q105 122 114 124" stroke="#7A5566" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <!-- whiskers -->
-      <path d="M70 104 L40 100 M70 110 L40 112 M140 104 L170 100 M140 110 L170 112" stroke="#E8B6A4" stroke-width="3" stroke-linecap="round"/>
-      <!-- blush -->
-      <circle cx="75" cy="112" r="8" fill="#F6A9B8" opacity="0.6"/>
-      <circle cx="135" cy="112" r="8" fill="#F6A9B8" opacity="0.6"/>
-
-      <!-- paw holding flower -->
-      <path d="M168 150 C 195 145, 205 165, 188 178 C 172 188, 155 178, 158 162 Z" fill="#F6D6C7"/>
-
-      <!-- flower stem -->
-      <path d="M188 168 C 200 145, 205 110, 198 78" stroke="#7FB88A" stroke-width="5" fill="none" stroke-linecap="round"/>
-      <path d="M198 120 C 212 116, 220 124, 214 134" stroke="#7FB88A" stroke-width="4" fill="none" stroke-linecap="round"/>
-
-      <!-- flower petals -->
-      <g transform="translate(198,70)">
-        <circle cx="0" cy="-16" r="13" fill="#F2A6C2"/>
-        <circle cx="14" cy="-7" r="13" fill="#F2A6C2"/>
-        <circle cx="9" cy="11" r="13" fill="#F2A6C2"/>
-        <circle cx="-9" cy="11" r="13" fill="#F2A6C2"/>
-        <circle cx="-14" cy="-7" r="13" fill="#F2A6C2"/>
-        <circle cx="0" cy="0" r="11" fill="#F7D87A"/>
-      </g>
-    </svg>
-
-    <img class="cat-illustration" id="catImage" alt="" style="display:none; object-fit:cover; border-radius:20px;">
-
-    <div class="poem" id="poemText">I asked, half-hoping, half-afraid,
-of all the words my heart had made —
-and you said yes, so soft, so true,
-now "forever" sounds like you.
-
-Every storm I'll face feels small,
-knowing you'll be there through it all.
-So here's my heart, no longer hiding —
-yours to hold, yours for the keeping. 💓</div>
-
-    <div class="poem-signature" id="poemSignature">forever starts now — Jee.kon 💌</div>
+  <!-- PAGE 3: Success -->
+  <div id="page3" class="container success-page hidden">
+    <div class="heart">❤️</div>
+    <h1 style="margin-top: 20px;">Yay! You Said Yes!</h1>
+    <div class="success-text" id="successMessage"></div>
+    <img id="successImage" class="love-image" style="display: none;">
+    <p style="margin-top: 30px; color: #666;">
+      With all my love,<br>
+      <span class="sender-name" id="displaySender"></span>
+    </p>
   </div>
-</section>
 
-<script>
-  // ---------- data encode / decode (for shareable links) ----------
-  function encodeData(obj){
-    const json = JSON.stringify(obj);
-    return btoa(unescape(encodeURIComponent(json)))
-      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  }
-
-  function decodeData(str){
-    let b64 = str.replace(/-/g, '+').replace(/_/g, '/');
-    while(b64.length % 4) b64 += '=';
-    const json = decodeURIComponent(escape(atob(b64)));
-    return JSON.parse(json);
-  }
-
-  // ---------- apply data to the question + final screens ----------
-  function applyData(data){
-    document.getElementById('eyebrowText').textContent = 'For ' + (data.g || 'Love');
-    document.getElementById('mainQuestionText').textContent = data.q || 'Will you be mine, forever? 💗';
-    document.getElementById('finalMessageText').textContent = data.f || "That's my love 💓";
-    if(data.p){
-      document.getElementById('poemText').textContent = data.p;
-    }
-    document.getElementById('poemSignature').textContent = 'forever starts now — ' + (data.b || 'Me') + ' 💌';
-
-    if(data.i){
-      document.getElementById('catSvg').style.display = 'none';
-      const img = document.getElementById('catImage');
-      img.src = data.i;
-      img.style.display = 'block';
-    }
-  }
-
-  // ---------- setup / customization ----------
-  async function createPage(){
-    const apiKey = document.getElementById('apiKeyInput').value.trim();
-    const data = {
-      g: document.getElementById('girlName').value.trim() || 'Love',
-      b: document.getElementById('boyName').value.trim() || 'Me',
-      q: document.getElementById('mainQuestionInput').value.trim() || 'Will you be mine, forever? 💗',
-      f: document.getElementById('finalMessageInput').value.trim() || "That's my love 💓",
-      p: document.getElementById('poemInput').value.trim(),
-      i: uploadedImageData
-    };
-
-    const createBtn = document.getElementById('createBtn');
-
-    // No API key — fall back to encoding in URL (no custom image support)
-    if(!apiKey){
-      const dataCopy = {...data, i:''};
-      const encoded = encodeData(dataCopy);
-      const url = window.location.origin + window.location.pathname + '?go=' + encoded;
-      document.getElementById('linkOutput').value = url;
-      document.getElementById('previewLink').href = url;
-      document.getElementById('linkResult').style.display = 'block';
-      document.getElementById('linkNote').textContent = 'No API key — image not included to keep link short.';
-      return;
-    }
-
-    // Save to JSONBin → get a short bin ID
-    createBtn.textContent = 'Saving... ⏳';
-    createBtn.disabled = true;
-
-    try{
-      const resp = await fetch('https://api.jsonbin.io/v3/b', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': apiKey,
-          'X-Bin-Name': 'love-page',
-          'X-Bin-Private': 'false'
-        },
-        body: JSON.stringify(data)
-      });
-
-      if(!resp.ok){
-        const err = await resp.json().catch(()=>({}));
-        throw new Error(err.message || 'JSONBin responded with ' + resp.status);
+  <script>
+    // Check if there's a link in the URL
+    window.onload = function() {
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        try {
+          const data = JSON.parse(atob(hash));
+          showQuestionPage(data);
+        } catch(e) {
+          console.log('Invalid link');
+        }
       }
-
-      const result = await resp.json();
-      const binId = result.metadata.id;
-      const url = window.location.origin + window.location.pathname + '?id=' + binId;
-
-      document.getElementById('linkOutput').value = url;
-      document.getElementById('previewLink').href = url;
-      document.getElementById('linkResult').style.display = 'block';
-      document.getElementById('linkNote').textContent = '✓ Image stored online. Link is short and clean!';
-    } catch(err){
-      alert('Could not save: ' + err.message + '\n\nCheck your JSONBin Master Key and try again.');
-    } finally{
-      createBtn.textContent = 'Create my link 💕';
-      createBtn.disabled = false;
-    }
-  }
-
-  // ---------- cat image upload (from gallery, resized + compressed) ----------
-  let uploadedImageData = '';
-
-  function handleImageUpload(event){
-    const file = event.target.files[0];
-    if(!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e){
-      const img = new Image();
-      img.onload = function(){
-        // Very aggressive compression: max 200px, low quality
-        // This keeps the base64 string short enough for a shareable link
-        const maxDim = 200;
-        let w = img.width, h = img.height;
-        if(w > h && w > maxDim){ h = Math.round(h * (maxDim / w)); w = maxDim; }
-        else if(h > maxDim){ w = Math.round(w * (maxDim / h)); h = maxDim; }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-
-        uploadedImageData = canvas.toDataURL('image/jpeg', 0.35);
-
-        const sizeKB = Math.round(uploadedImageData.length * 0.75 / 1024);
-        const hint = document.querySelector('.field-hint');
-        hint.textContent = `✓ Image compressed to ~${sizeKB}KB. Link will be longer but shareable.`;
-
-        document.getElementById('imagePreview').src = uploadedImageData;
-        document.getElementById('imagePreviewWrap').style.display = 'flex';
-      };
-      img.src = e.target.result;
     };
-    reader.readAsDataURL(file);
-  }
 
-  function clearImage(){
-    uploadedImageData = '';
-    document.getElementById('catImageInput').value = '';
-    document.getElementById('imagePreviewWrap').style.display = 'none';
-  }
-
-  function copyLink(){
-    const input = document.getElementById('linkOutput');
-    input.select();
-    navigator.clipboard.writeText(input.value).then(()=>{
-      const btn = document.getElementById('copyBtn');
-      const original = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(()=> btn.textContent = original, 1500);
-    }).catch(()=>{
-      document.execCommand('copy');
+    // Image preview
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const preview = document.getElementById('imagePreview');
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
     });
-  }
 
-  // ---------- on load: if this is a custom link, skip straight to the question ----------
-  (async function init(){
-    const params = new URLSearchParams(window.location.search);
+    // Form submission
+    document.getElementById('loveForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const btn = document.getElementById('createBtn');
+      const loader = document.getElementById('loader');
+      const fileInput = document.getElementById('imageInput');
+      
+      btn.disabled = true;
+      loader.style.display = 'block';
+      
+      try {
+        // Upload image to ImgBB
+        const imageUrl = await uploadImage(fileInput.files[0]);
+        
+        // Prepare data
+        const data = {
+          lover: document.getElementById('loverName').value,
+          sender: document.getElementById('senderName').value,
+          question: document.getElementById('question').value,
+          image: imageUrl
+        };
+        
+        // Create short link
+        const encoded = btoa(JSON.stringify(data));
+        const baseUrl = window.location.origin + window.location.pathname;
+        const shortLink = `${baseUrl}#${encoded}`;
+        
+        // Show result
+        document.getElementById('linkBox').textContent = shortLink;
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        
+      } catch (error) {
+        alert('Error creating link. Please try again.');
+        console.error(error);
+      } finally {
+        btn.disabled = false;
+        loader.style.display = 'none';
+      }
+    });
 
-    // Short link mode — fetch from JSONBin
-    if(params.has('id')){
-      const binId = params.get('id');
-      try{
-        const resp = await fetch('https://api.jsonbin.io/v3/b/' + binId + '/latest');
-        if(!resp.ok) throw new Error('fetch failed');
-        const result = await resp.json();
-        const data = result.record;
-        applyData(data);
-        document.getElementById('screen-setup').style.display = 'none';
-        document.getElementById('screen-question').style.display = 'flex';
-        return;
-      } catch(e){
-        // fall through to setup
+    // Upload to ImgBB (Free API)
+    async function uploadImage(file) {
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      const response = await fetch('https://api.imgbb.com/1/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        return data.data.url;
+      }
+      throw new Error('Upload failed');
+    }
+
+    function copyLink() {
+      const link = document.getElementById('linkBox').textContent;
+      navigator.clipboard.writeText(link).then(() => {
+        alert('Link copied! Share it with your love! 💕');
+      });
+    }
+
+    function showQuestionPage(data) {
+      document.getElementById('page1').classList.add('hidden');
+      document.getElementById('page2').classList.remove('hidden');
+      
+      document.getElementById('displayQuestion').textContent = 
+        `Dear ${data.lover}, ${data.question}`;
+      
+      if (data.image) {
+        const img = document.getElementById('displayImage');
+        img.src = data.image;
+        img.style.display = 'block';
+      }
+      
+      // Store data for yes button
+      window.currentData = data;
+    }
+
+    let noCount = 0;
+    const noMessages = [
+      "Please... there's nothing in No 😢",
+      "Are you sure? Think again! 💭",
+      "My heart is breaking... say Yes! 💔",
+      "Just one little Yes? Pretty please! 🥺",
+      "I won't take No for an answer! 😊",
+      "Yes is the only right answer! ❤️"
+    ];
+
+    function sayNo() {
+      const msgBox = document.getElementById('noMessage');
+      msgBox.textContent = noMessages[noCount % noMessages.length];
+      msgBox.style.display = 'block';
+      noCount++;
+      
+      // Move the No button randomly
+      const btn = document.getElementById('noBtn');
+      const x = (Math.random() - 0.5) * 200;
+      const y = (Math.random() - 0.5) * 100;
+      btn.style.transform = `translate(${x}px, ${y}px)`;
+      
+      setTimeout(() => {
+        btn.style.transform = 'translate(0, 0)';
+      }, 1000);
+    }
+
+    function sayYes() {
+      const data = window.currentData;
+      document.getElementById('page2').classList.add('hidden');
+      document.getElementById('page3').classList.remove('hidden');
+      
+      document.getElementById('successMessage').innerHTML = 
+        `Dear ${data.lover}, you just made me the happiest person in the world! ` +
+        `I love you more than words can express. You mean everything to me! 💕✨`;
+      
+      if (data.image) {
+        const img = document.getElementById('successImage');
+        img.src = data.image;
+        img.style.display = 'block';
+      }
+      
+      document.getElementById('displaySender').textContent = data.sender;
+      
+      // Confetti effect
+      createConfetti();
+    }
+
+    function createConfetti() {
+      const colors = ['#f093fb', '#f5576c', '#4facfe', '#43e97b', '#fa709a'];
+      for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.style.position = 'fixed';
+          confetti.style.width = '10px';
+          confetti.style.height = '10px';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.top = '-10px';
+          confetti.style.borderRadius = '50%';
+          confetti.style.zIndex = '9999';
+          confetti.style.pointerEvents = 'none';
+          document.body.appendChild(confetti);
+          
+          const duration = Math.random() * 3 + 2;
+          confetti.animate([
+            { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+            { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+          ], {
+            duration: duration * 1000,
+            easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          }).onfinish = () => confetti.remove();
+        }, i * 50);
       }
     }
-
-    // Fallback encoded URL mode
-    if(params.has('go')){
-      try{
-        const data = decodeData(params.get('go'));
-        applyData(data);
-        document.getElementById('screen-setup').style.display = 'none';
-        document.getElementById('screen-question').style.display = 'flex';
-        return;
-      } catch(e){
-        // fall through to setup
-      }
-    }
-
-    // Legacy hash mode
-    const hash = window.location.hash;
-    if(hash.startsWith('#go=')){
-      try{
-        const data = decodeData(hash.slice(4));
-        applyData(data);
-        document.getElementById('screen-setup').style.display = 'none';
-        document.getElementById('screen-question').style.display = 'flex';
-        return;
-      }catch(e){}
-    }
-  })();
-
-  // ---------- floating hearts on screen 1 ----------
-  const heartsBg = document.getElementById('heartsBg');
-  const heartSymbols = ['💗','💕','♥','💖'];
-  for(let i=0;i<14;i++){
-    const h = document.createElement('div');
-    h.className = 'heart-float';
-    h.textContent = heartSymbols[Math.floor(Math.random()*heartSymbols.length)];
-    h.style.left = Math.random()*100 + '%';
-    h.style.fontSize = (14 + Math.random()*18) + 'px';
-    h.style.animationDuration = (8 + Math.random()*10) + 's';
-    h.style.animationDelay = (Math.random()*10) + 's';
-    heartsBg.appendChild(h);
-  }
-
-  // ---------- "No" button logic ----------
-  const noBtn = document.getElementById('noBtn');
-  const yesBtn = document.getElementById('yesBtn');
-
-  const noMessages = [
-    "No",
-    "Are you sure?",
-    "Really sure? 🤔",
-    "Hmm, think again...",
-    "Last chance to change your mind!",
-    "Error: button not responding",
-    "404 — 'No' not found",
-    "This button seems broken 😅",
-    "Try the other one instead",
-    "Your heart already picked Yes 💓",
-    "Okay, I'll stop running... say yes? 🥹",
-    "Yes is literally right there 👉",
-    "Wow, you really mean it? 😢",
-    "Pretty please? 🥺",
-    "I'll keep asking forever...",
-    "Forever is a long time to keep clicking 😉",
-    "Plot twist: I'm not giving up",
-    "The Yes button is so much nicer, just saying",
-    "Statistically, Yes is the better choice 📊",
-    "I made this whole page just for you...",
-    "Don't break my heart 💔",
-    "Fine, I'll wait. (Still waiting...)",
-    "Are we really doing this right now?",
-    "One more click and I might cry 😭",
-    "Is this really your final answer?",
-    "Okay you win... jk, click Yes 😅",
-    "Deep down you know it's Yes",
-    "This button has given up trying to escape"
-  ];
-
-  let clickCount = 0;
-
-  function dodgeNo(){
-    clickCount++;
-
-    // update message (cap index at last message, then cycle the last few)
-    const idx = Math.min(clickCount, noMessages.length - 1);
-    noBtn.textContent = noMessages[idx];
-
-    // grow the Yes button a little each time, up to a cap
-    const scale = Math.min(1 + clickCount * 0.07, 1.7);
-    yesBtn.style.transform = `scale(${scale})`;
-
-    // move the No button to a random spot, but only within the dodge zone
-    noBtn.classList.add('fixed-pos');
-
-    const zone = document.querySelector('#screen-question .dodge-zone');
-    const zoneWidth = zone.clientWidth;
-    const zoneHeight = zone.clientHeight;
-    const btnWidth = noBtn.offsetWidth;
-    const btnHeight = noBtn.offsetHeight;
-
-    const maxX = Math.max(0, zoneWidth - btnWidth);
-    const maxY = Math.max(0, zoneHeight - btnHeight);
-
-    const randX = Math.random() * maxX;
-    const randY = Math.random() * maxY;
-
-    noBtn.style.left = randX + 'px';
-    noBtn.style.top = randY + 'px';
-  }
-
-  // ---------- "Yes" button logic ----------
-  function sayYes(){
-    document.getElementById('screen-question').style.display = 'none';
-    const finalScreen = document.getElementById('screen-final');
-    finalScreen.style.display = 'flex';
-
-    // gold confetti hearts
-    for(let i=0;i<24;i++){
-      const c = document.createElement('div');
-      c.className = 'confetti-heart';
-      c.textContent = ['💛','💖','✨','💗'][Math.floor(Math.random()*4)];
-      c.style.left = Math.random()*100 + '%';
-      c.style.fontSize = (14 + Math.random()*16) + 'px';
-      c.style.animationDuration = (3 + Math.random()*4) + 's';
-      c.style.animationDelay = (Math.random()*2) + 's';
-      finalScreen.appendChild(c);
-    }
-  }
-</script>
-
+  </script>
 </body>
 </html>
+```
